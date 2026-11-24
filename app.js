@@ -3,8 +3,8 @@ const KEY = "nuriaCare.v1";
 const $ = (s, r = document) => r.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const uid = p => p + Math.random().toString(36).slice(2, 7).toUpperCase();
-const fmt = d => d ? new Date(d).toLocaleString("es-PA", { dateStyle: "medium", timeStyle: "short" }) : "";
-const fmtD = d => new Date(d).toLocaleDateString("es-PA", { dateStyle: "medium" });
+const fmt = d => d ? new Date(d).toLocaleString("es", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
+const fmtD = d => new Date(d).toLocaleDateString("es", { day: "numeric", month: "short", year: "numeric" });
 const nowLocal = () => new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
 
 const defaults = () => ({ patients: [], vitals: [], notes: [], activity: [], settings: { user: "Estudiante de Enfermería", center: "Centro de práctica ficticio", theme: "light" } });
@@ -26,7 +26,7 @@ function render() {
   document.documentElement.dataset.theme = db.settings.theme;
   $("#nav").innerHTML = routes.map(([k, l, i]) => `<button data-r="${k}" class="${k === route ? "on" : ""}"><svg viewBox="0 0 24 24">${icons[i]}</svg>${l}</button>`).join("");
   $("#title").textContent = routes.find(r => r[0] === route)[1];
-  $("#today").textContent = new Date().toLocaleDateString("es-PA", { dateStyle: "full" });
+  { const f = new Date().toLocaleDateString("es", { weekday: "long", day: "numeric", month: "long", year: "numeric" }); $("#today").textContent = f.charAt(0).toUpperCase() + f.slice(1); }
   $("#userChip").textContent = db.settings.user;
   $("#view").innerHTML = views[route]();
   bind();
@@ -100,7 +100,7 @@ const views = {
 };
 
 function field(l, n, v = "", o = {}) {
-  return `<label class="${o.full ? "full" : ""}">${l}${o.area ? `<textarea name="${n}" rows="3">${esc(v)}</textarea>` : o.sel ? `<select name="${n}">${o.sel.map(x => `<option value="${x[0] ?? x}" ${(x[0] ?? x) === v ? "selected" : ""}>${x[1] ?? x}</option>`).join("")}</select>` : `<input name="${n}" type="${o.type || "text"}" value="${esc(v)}" ${o.step ? `step="${o.step}"` : ""} ${o.ph ? `placeholder="${o.ph}"` : ""}>`}<span class="msg"></span></label>`;
+  return `<label class="${o.full ? "full" : ""}">${l}${o.area ? `<textarea name="${n}" rows="3">${esc(v)}</textarea>` : o.sel ? `<select name="${n}">${o.sel.map(x => { const [a, b] = Array.isArray(x) ? x : [x, x]; return `<option value="${a}" ${a === v ? "selected" : ""}>${b}</option>`; }).join("")}</select>` : `<input name="${n}" type="${o.type || "text"}" value="${esc(v)}" ${o.step ? `step="${o.step}"` : ""} ${o.ph ? `placeholder="${o.ph}"` : ""}>`}<span class="msg"></span></label>`;
 }
 function form(title, fields, onSave) {
   openModal(`<h2>${title}</h2><br><form class="form" id="mf" novalidate>${fields}<div class="full row"><button class="btn">Guardar</button><button type="button" class="btn ghost" id="mx">Cancelar</button></div></form>`);
@@ -185,4 +185,6 @@ $("#nav").onclick = e => { const b = e.target.closest("button"); if (b) go(b.dat
 $("#menuBtn").onclick = () => $("#side").classList.toggle("open");
 $("#modal").onclick = e => { if (e.target.id === "modal") closeModal(); };
 document.onkeydown = e => { if (e.key === "Escape") closeModal(); };
-render();
+let firstVisit = false;
+try { firstVisit = localStorage.getItem(KEY) === null; } catch { firstVisit = false; }
+if (firstVisit) seed(); else render();
