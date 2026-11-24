@@ -14,7 +14,7 @@ nav svg,.ico{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1
 .main{flex:1;min-width:0}
 .top{display:flex;align-items:center;gap:14px;padding:18px 28px;background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
 :root[data-theme=dark] .top{background:rgba(15,28,32,.7)}
-.top span{color:var(--mute);font-size:.85rem;text-transform:capitalize}.user{margin-left:auto;background:var(--sky);padding:6px 12px;border-radius:99px;font-size:.85rem}
+.top span{color:var(--mute);font-size:.85rem}.user{margin-left:auto;background:var(--sky);padding:6px 12px;border-radius:99px;font-size:.85rem}
 .menu-btn{display:none}
 main{padding:24px 28px;max-width:1200px;animation:in .25s}
 @keyframes in{from{opacity:0;transform:translateY(6px)}}
